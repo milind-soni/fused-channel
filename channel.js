@@ -44,12 +44,14 @@
     return global.enableMessaging({ source: view, channel, sender, type: 'brush', on, off, getPayload });
   };
 
-  global.enableButtonMessaging = function(el, channel, sender, event = 'click', basePayload = {}) {
-    const on  = (e, h) => e.addEventListener(event, h);
-    const off = (e, h) => e.removeEventListener(event, h);
-    const getPayload = (ev) => ({ id: el.id || null, event, ...basePayload });
-    return global.enableMessaging({ source: el, channel, sender, type: 'button', on, off, getPayload });
+  global.enableButtonMessaging = function(el, channel, sender, basePayload = {}) {
+    const ch = fusedChannel(channel);
+    const handler = () => ch.publish('button', { id: el.id || null, event: 'click', ...basePayload }, sender);
+    el.addEventListener('click', handler);
+    window.addEventListener('beforeunload', () => ch.close && ch.close());
+    return () => el.removeEventListener('click', handler);
   };
+
 
 
 })(this);
