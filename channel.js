@@ -51,23 +51,11 @@
     return global.enableMessaging({ source: el, channel, sender, type: 'button', on, off, getPayload });
   };
   
-  global.enableMsgListener = function(channel, type='any', onMessage) {
+  global.enableMsgListener = function(channel, onMessage) {
     const ch = fusedChannel(channel);
-    const handler = m => {
-      if (type !== 'any' && m.type !== type) return;
-      if (typeof onMessage === 'function') onMessage(m);
-      else {
-        const el = document.getElementById('out');
-        if (el) el.textContent = JSON.stringify(m, null, 2);
-      }
-    };
-    if (type === 'any' && ch.t instanceof BroadcastChannel) {
-      ch.t.addEventListener('message', e => handler(e.data));
-    } else {
-      ch.on(type, handler);
-    }
-    window.addEventListener('beforeunload', () => ch.close && ch.close());
-    return () => ch.on && ch.on(type, null);
+    ch.on('message', m => onMessage ? onMessage(m) : (
+      document.getElementById('out').textContent = JSON.stringify(m, null, 2)
+    ));
   };
 
 })(this);
