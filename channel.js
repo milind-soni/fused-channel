@@ -9,12 +9,18 @@
       }
       function on(type, handler) {
         if (t instanceof BroadcastChannel) {
-          t.addEventListener("message", e => { if (e.data?.type === type) handler(e.data); });
+          t.addEventListener("message", e => {
+            if (type === '*' || e.data?.type === type) handler(e.data);
+          });
         } else {
-          t.addEventListener(type, e => handler(e.detail));
+          t.addEventListener("message", e => {
+            if (type === '*' || e.detail?.type === type) handler(e.detail);
+          });
         }
       }
+
       function close() { if (t.close) t.close(); }
+
       return { publish, on, close };
     };
   }
