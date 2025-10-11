@@ -50,12 +50,6 @@
     const getPayload = (ev) => ({ id: el.id || null, event, ...basePayload });
     return global.enableMessaging({ source: el, channel, sender, type: 'button', on, off, getPayload });
   };
-  
-  global.enableMsgListener = function(channel, onMessage) {
-    const ch = fusedChannel(channel);
-    ch.on('message', m => onMessage ? onMessage(m) : (
-      document.getElementById('out').textContent = JSON.stringify(m, null, 2)
-    ));
-  };
+
 
 })(this);
