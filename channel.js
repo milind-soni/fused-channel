@@ -53,7 +53,4 @@
     return () => el.removeEventListener(event, handler);
   };
 
-
-
-
 })(this);
