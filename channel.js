@@ -67,5 +67,12 @@
     });
   };
 
+  global.enableDropdownMessaging = function(el, channel, sender) {
+    const ch = fusedChannel(channel);
+    const handler = () => ch.publish('dropdown', { value: el.value }, sender);
+    el.addEventListener('change', handler);
+    if (el.value) handler(); // Send initial value
+    return () => el.removeEventListener('change', handler);
+  };
 
 })(this);
