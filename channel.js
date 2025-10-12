@@ -61,10 +61,11 @@
 
   global.enableMsgListener = function(channel, onMessage) {
     const ch = fusedChannel(channel);
-    const render = m => (onMessage ? onMessage(m)
-                                   : (document.getElementById('out').textContent = JSON.stringify(m, null, 2)));
-    ch.on('*', render);
-    window.addEventListener('beforeunload', () => ch.close && ch.close());
+    ch.on('*', m => {
+      if (onMessage) return onMessage(m);
+      document.body.textContent = JSON.stringify(m, null, 2);
+    });
   };
+
 
 })(this);
