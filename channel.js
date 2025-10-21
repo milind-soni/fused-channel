@@ -8,7 +8,7 @@
           t.postMessage(msg);
         } else {
           t.dispatchEvent(new CustomEvent(type, { detail: msg }));
-          t.dispatchEvent(new CustomEvent("message", { detail: msg })); // ensure '*' listeners get messages
+          t.dispatchEvent(new CustomEvent("message", { detail: msg }));
         }
       }
       function on(type, handler) {
@@ -56,8 +56,7 @@
 
   global.enableButtonMessaging = function(el, channel, sender, basePayload = {}, event = "click") {
     const ch = fusedChannel(channel);
-    const handler = () =>
-      ch.publish("button", { id: el.id || null, event, ...basePayload }, sender);
+    const handler = () => ch.publish("button", { id: el.id || null, event, ...basePayload }, sender);
     el.addEventListener(event, handler);
     window.addEventListener("beforeunload", () => ch.close && ch.close());
     return () => el.removeEventListener(event, handler);
@@ -79,9 +78,15 @@
     return () => el.removeEventListener("change", handler);
   };
 
-  // 🔹 new helper for standardized receivers
-  global.publishVars = (channel, sender, vars) => {
-    fusedChannel(channel).publish("vars", { vars }, sender);
-  };
+  function remapKeys(obj, mapping) {
+    if (!mapping) return obj || {};
+    const out = {};
+    for (const [k, v] of Object.entries(obj || {})) out[mapping[k] || k] = v;
+    return out;
+  }
 
+  global.publishVars = function(channel, sender, vars, keyMapping = null) {
+    const flat = remapKeys(vars, keyMapping);
+    fusedChannel(channel).publish("vars", flat, sender);
+  };
 })(this);
